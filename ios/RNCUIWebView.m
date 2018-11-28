@@ -253,6 +253,23 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _onMessage(event);
   }
 
+  NSString* reqUrl = request.URL.absoluteString;
+  if ([reqUrl hasPrefix:@"alipays://"] || [reqUrl hasPrefix:@"alipay://"]) {
+      // NOTE: 跳转支付宝App
+      BOOL bSucc = [[UIApplication sharedApplication]openURL:request.URL];
+
+      // NOTE: 如果跳转失败，则跳转itune下载支付宝App
+      if (!bSucc) {
+          UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示"
+                                                          message:@"未检测到支付宝客户端，请安装后重试。"
+                                                        delegate:self
+                                                cancelButtonTitle:@"立即安装"
+                                                otherButtonTitles:nil];
+          [alert show];
+      }
+      return NO;
+  }
+
   // JS Navigation handler
   return !isJSNavigation;
 }
