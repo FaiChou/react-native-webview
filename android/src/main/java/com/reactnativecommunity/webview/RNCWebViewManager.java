@@ -33,6 +33,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -140,6 +144,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
       if (url.equals(BLANK_URL)) return false;
+
+      final Context context = view.getContext();
+    
+      // ------  对alipays:相关的scheme处理 -------
+      if(url.startsWith("alipays:") || url.startsWith("alipay")) {
+        try {
+        context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse(url)));
+        } catch (Exception e) {
+          new AlertDialog.Builder(context)
+          .setMessage("未检测到支付宝客户端，请安装后重试。")
+          .setPositiveButton("立即安装", new DialogInterface.OnClickListener() {
+      
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            Uri alipayUrl = Uri.parse("https://d.alipay.com");
+            context.startActivity(new Intent("android.intent.action.VIEW", alipayUrl));
+            }
+          }).setNegativeButton("取消", null).show();
+        }
+        return true;
+      }
+      // ------- 处理结束 -------
 
       // url blacklisting
       if (mUrlPrefixesForDefaultIntent != null && mUrlPrefixesForDefaultIntent.size() > 0) {
