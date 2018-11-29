@@ -165,7 +165,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
         return true;
       }
-      // ------- 处理结束 -------
+
+      // wechat pay
+      if (url.startsWith("weixin://wap/pay?")) {
+          Intent intent = new Intent();
+          intent.setAction(Intent.ACTION_VIEW);
+          intent.setData(Uri.parse(url));
+          context.startActivity(intent);
+          return true;
+      }
 
       // url blacklisting
       if (mUrlPrefixesForDefaultIntent != null && mUrlPrefixesForDefaultIntent.size() > 0) {

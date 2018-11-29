@@ -268,6 +268,17 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
           [alert show];
       }
       return NO;
+  } else if ([reqUrl hasPrefix:@"weixin://"]) {
+    BOOL bSucc = [[UIApplication sharedApplication]openURL:request.URL];
+    if (!bSucc) {
+      UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示"
+                                                          message:@"未检测到微信客户端，请安装后重试。"
+                                                        delegate:self
+                                                cancelButtonTitle:@"立即安装"
+                                                otherButtonTitles:nil];
+      [alert show];
+    }
+    return NO;
   }
 
   // JS Navigation handler
